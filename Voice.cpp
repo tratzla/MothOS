@@ -15,7 +15,7 @@
 #include "Samples/special3.h"
 //sfx
 
-
+#include "Samples/sfx1.h"
 #include "Samples/sfx2.h"
 #include "Samples/sfx3.h"
 #include "Samples/sfx4.h"
@@ -291,8 +291,8 @@ int Voice::ReadSfxWaveform() {
 
   switch (note) {
     case 0:
-      sampleLen = sfx2Length;
-      sample = sfx2[subSampleIndex];
+      sampleLen = sfx1Length;
+      sample = sfx1[subSampleIndex];
       break;
     case 1:
       sampleLen = sfx2Length;
