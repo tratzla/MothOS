@@ -53,21 +53,22 @@ Voice::Voice() {
   SetVolume(2);
   SetupArps();
   for (int i = 0; i <= 100; i++) {
-    int i2 = i * 2 - 100;
+    int i2 = (200 - i * 2);
     int i3 = i * 2;
+    if (i2 > 100)
+      i2 = 100;
     if (i3 > 100)
       i3 = 100;
-    if (i2 < 0)
-      i2 = 0;
 
-    envelopes[0][i] = (sqrt(sqrt(i2) * 5) / 3) + 1;
-    envelopes[1][i] = (sqrt(sqrt(100 - i3) * 5) / 3) + 1;
+    envelopes[0][i] = i2;
+    envelopes[1][i] = i3;
     envelopes[2][i] = 1;
     envelopes[3][i] = 1;
-    if (i == 100) {
-      envelopes[0][i] = 10000;
-      envelopes[1][i] = 10000;
-      envelopes[2][i] = 10000;
+    if (i > 95) {
+      //fade out envs
+      envelopes[0][i] /= 1 + ((i - 95) * 20);
+      envelopes[1][i] /= 1 + ((i - 95) * 20);
+      envelopes[2][i] /= 1 + ((i - 95) * 20);
     }
   }
 }
@@ -122,14 +123,14 @@ int Voice::UpdateVoice() {
   }
 
   if (volumeNum == 3) {
-    int limit = 6000;
-    if (abs(sample) > 6000) {
+    int limit = 3000;
+    if (abs(sample) > limit) {
       if (sample > 0) {
         sample = limit;
       } else {
         sample = limit * -1;
       }
-      sample = (sample * 2);
+      sample = (sample * 3);
     }
   }
 
@@ -199,7 +200,7 @@ int Voice::ReadWaveform() {
       envelopeIndex = 1;
   }
 
-  sample = sample / volume / envelopes[envelopeNum][envelopeIndex / 250];
+  sample = (sample * volume * envelopes[envelopeNum][envelopeIndex / 250]) / 300;  //300 because of 3 volume levels
 
   if (isDelay) {
     sample /= 3;
@@ -275,7 +276,7 @@ int Voice::ReadDrumWaveform() {
 
     sampleIndex += oct * 1000;
   }
-  sample = (int)(sample / volume);
+  sample = (sample * volume / 3);
   if (isDelay) {
     sample /= 3;
   }
@@ -348,7 +349,7 @@ int Voice::ReadSfxWaveform() {
 
     sampleIndex += oct * 1000;
   }
-  sample = (sample / volume);
+  sample = (sample * volume / 3);
   if (isDelay) {
     sample /= 3;
   }
@@ -398,16 +399,16 @@ void Voice::SetVolume(int val) {
   volumeNum = val;
   switch (val) {
     case 0:
-      volume = 4;
+      volume = 1;
       break;
     case 1:
       volume = 2;
       break;
     case 2:
-      volume = 1;
+      volume = 3;
       break;
     case 3:
-      volume = 1;
+      volume = 3;
       break;
   }
 }
